@@ -1,0 +1,19 @@
+version: '3'
+
+vars:
+  BIN: ./bin/tinygo
+  TINYGO_CFG: ./config/tinygo/gear.json
+
+tasks:
+  wasm-build:
+    cmds:
+      - cmd: echo 'make sure you have up-to-date CUSTOM tinygo binary either built from the source (https://github.com/misnaged/tinygo) or downloaded from release (https://github.com/misnaged/tinygo/releases)'
+        silent: true
+      - cmd: echo 'check if your CUSTOM tinygo binary is in ./bin folder'
+        silent: true
+      - cmd: echo 'build arguments are allowed after  `--`  see example below'
+        silent: true
+      - cmd: echo 'example. ` task wasm-build -- -o ./examples/exec/wait-wake/wait-wake.wasm ./examples/exec/wait-wake/  `'
+        silent: true
+      - '{{.BIN}} build -target {{.TINYGO_CFG}} {{.CLI_ARGS}}'
+

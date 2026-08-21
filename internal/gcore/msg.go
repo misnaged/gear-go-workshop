@@ -1,19 +1,9 @@
 package gcore
 
 import (
-	"errors"
 	"unsafe"
 
 	"github.com/misnaged/gear-go-workshop/internal/gsys"
-)
-
-const zeroValuePtr uint32 = 0xffffffff
-
-type ActorID [32]byte
-
-var (
-	ErrBufferTooSmall = errors.New("buffer is too small")
-	ErrReadFailed     = errors.New("gr_read failed")
 )
 
 func Source() ActorID {
@@ -24,6 +14,43 @@ func Source() ActorID {
 	)
 
 	return source
+}
+func ID() MessageID {
+	var id MessageID
+
+	gsys.MessageID(
+		uint32(uintptr(unsafe.Pointer(&id[0]))),
+	)
+
+	return id
+}
+
+func Value() Uint128 {
+	var value Uint128
+
+	gsys.Value(
+		uint32(uintptr(unsafe.Pointer(&value))),
+	)
+
+	return value
+}
+
+func ReplyTo() (MessageID, error) {
+	var result [36]byte
+
+	gsys.ReplyTo(
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyTo
+	}
+
+	var id MessageID
+	copy(id[:], result[4:])
+
+	return id, nil
 }
 
 func Reply(payload []byte) {
@@ -84,4 +111,51 @@ func Size() int {
 	)
 
 	return int(size)
+}
+func Send(destination ActorID, payload []byte, value Uint128) (MessageID, error) {
+	pidValue := hashWithValue{
+		Hash:  destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	var payloadPtr uint32
+	if len(payload) > 0 {
+		payloadPtr = uint32(uintptr(unsafe.Pointer(&payload[0])))
+	}
+
+	gsys.Send(
+		uint32(uintptr(unsafe.Pointer(&pidValue))),
+		payloadPtr,
+		uint32(len(payload)),
+		0,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:])
+
+	return id, nil
+}
+
+func ReplyDeposit(messageID MessageID, gas uint64) error {
+	var errorCode uint32
+
+	gsys.ReplyDeposit(
+		uint32(uintptr(unsafe.Pointer(&messageID[0]))),
+		gas,
+		uint32(uintptr(unsafe.Pointer(&errorCode))),
+	)
+
+	if errorCode != 0 {
+		return ErrReplyDepositFailed
+	}
+
+	return nil
 }
