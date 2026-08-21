@@ -1,6 +1,7 @@
 BIN:=./build/tinygo
 TINYGO_CFG:= ./config/tinygo/gear.json
-OUTPUT:= ./program.wasm
+#OUTPUT:= ./program.wasm
+OUTPUT:= ../gear-go/assets/wasm/test/program.wasm
 
 
 wasm-build:
