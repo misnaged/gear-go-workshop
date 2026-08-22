@@ -10,6 +10,14 @@ func Wait() {
 	gsys.Wait()
 }
 
+func WaitFor(duration uint32) {
+	gsys.WaitFor(duration)
+}
+
+func WaitUpTo(duration uint32) {
+	gsys.WaitUpTo(duration)
+}
+
 func ProgramID() ActorID {
 	var id ActorID
 
@@ -31,11 +39,15 @@ func GasAvailable() uint64 {
 }
 
 func Wake(messageID MessageID) error {
+	return WakeDelayed(messageID, 0)
+}
+
+func WakeDelayed(messageID MessageID, delay uint32) error {
 	var errorCode uint32
 
 	gsys.Wake(
 		uint32(uintptr(unsafe.Pointer(&messageID[0]))),
-		0,
+		delay,
 		uint32(uintptr(unsafe.Pointer(&errorCode))),
 	)
 
