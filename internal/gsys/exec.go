@@ -9,5 +9,11 @@ func GasAvailable(resultPtr uint32)
 //go:wasmimport env gr_wait
 func Wait()
 
+//go:wasmimport env gr_wait_for
+func WaitFor(duration uint32)
+
+//go:wasmimport env gr_wait_up_to
+func WaitUpTo(duration uint32)
+
 //go:wasmimport env gr_wake
 func Wake(messageIDPtr uint32, delay uint32, errorPtr uint32)

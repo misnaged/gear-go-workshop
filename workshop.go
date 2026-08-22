@@ -1,6 +1,8 @@
 package main
 
 //go:wasmexport handle
-func handle() {}
+func handle() {
+	//default entrypoint. for examples see ./examples
+}
 
 func main() {}
