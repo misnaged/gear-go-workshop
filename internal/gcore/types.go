@@ -13,3 +13,7 @@ type hashWithValue struct {
 	Hash  ActorID
 	Value Uint128
 }
+type blockNumberWithHash struct {
+	BlockNumber uint32
+	Hash        [32]byte
+}

@@ -29,3 +29,22 @@ func Wake(messageID gcore.MessageID) error {
 func WakeDelayed(messageID gcore.MessageID, delay uint32) error {
 	return gcore.WakeDelayed(messageID, delay)
 }
+
+func Leave() {
+	gcore.Leave()
+}
+
+func ValueAvailable() gcore.Uint128 {
+	return gcore.ValueAvailable()
+}
+
+func BlockHeight() uint32 {
+	return gcore.BlockHeight()
+}
+
+func BlockTimestamp() uint64 {
+	return gcore.BlockTimestamp()
+}
+func Random(subject [32]byte) ([32]byte, uint32) {
+	return gcore.Random(subject)
+}
