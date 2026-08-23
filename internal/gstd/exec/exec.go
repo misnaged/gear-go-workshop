@@ -60,3 +60,7 @@ func UnreserveGas(id gcore.ReservationID) (uint64, error) {
 func SystemReserveGas(amount uint64) error {
 	return gcore.SystemReserveGas(amount)
 }
+
+func Exit(inheritorID gcore.ActorID) {
+	gcore.Exit(inheritorID)
+}

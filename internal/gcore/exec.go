@@ -155,3 +155,9 @@ func SystemReserveGas(amount uint64) error {
 
 	return nil
 }
+
+func Exit(inheritorID ActorID) {
+	gsys.Exit(
+		uint32(uintptr(unsafe.Pointer(&inheritorID[0]))),
+	)
+}
