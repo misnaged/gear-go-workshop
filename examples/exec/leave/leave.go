@@ -15,7 +15,6 @@ func handle() {
 	if string(payload) == "LEAVE" {
 		exec.Leave()
 
-		// Этого быть не должно.
 		msg.ReplyBytes([]byte("AFTER_LEAVE"))
 	}
 }
