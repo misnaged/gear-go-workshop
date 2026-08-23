@@ -48,3 +48,15 @@ func BlockTimestamp() uint64 {
 func Random(subject [32]byte) ([32]byte, uint32) {
 	return gcore.Random(subject)
 }
+
+func ReserveGas(amount uint64, duration uint32) (gcore.ReservationID, error) {
+	return gcore.ReserveGas(amount, duration)
+}
+
+func UnreserveGas(id gcore.ReservationID) (uint64, error) {
+	return gcore.UnreserveGas(id)
+}
+
+func SystemReserveGas(amount uint64) error {
+	return gcore.SystemReserveGas(amount)
+}

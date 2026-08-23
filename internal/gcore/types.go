@@ -3,7 +3,10 @@ package gcore
 const zeroValuePtr uint32 = 0xffffffff
 
 type ActorID [32]byte
+
 type MessageID [32]byte
+
+type ReservationID [32]byte
 
 type Uint128 struct {
 	Lo uint64
