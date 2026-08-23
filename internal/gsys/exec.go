@@ -32,3 +32,12 @@ func BlockTimestamp(resultPtr uint32)
 
 //go:wasmimport env gr_random
 func Random(subjectPtr uint32, resultPtr uint32)
+
+//go:wasmimport env gr_reserve_gas
+func ReserveGas(amount uint64, duration uint32, resultPtr uint32)
+
+//go:wasmimport env gr_unreserve_gas
+func UnreserveGas(idPtr uint32, resultPtr uint32)
+
+//go:wasmimport env gr_system_reserve_gas
+func SystemReserveGas(amount uint64, errorPtr uint32)

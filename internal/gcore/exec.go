@@ -1,6 +1,7 @@
 package gcore
 
 import (
+	"encoding/binary"
 	"unsafe"
 
 	"github.com/misnaged/gear-go-workshop/internal/gsys"
@@ -100,4 +101,57 @@ func Random(subject [32]byte) ([32]byte, uint32) {
 	)
 
 	return result.Hash, result.BlockNumber
+}
+
+func ReserveGas(amount uint64, duration uint32) (ReservationID, error) {
+	var result [36]byte
+
+	gsys.ReserveGas(
+		amount,
+		duration,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return ReservationID{}, ErrReserveGasFailed
+	}
+
+	var id ReservationID
+	copy(id[:], result[4:])
+
+	return id, nil
+}
+
+func UnreserveGas(id ReservationID) (uint64, error) {
+	var result [12]byte
+
+	gsys.UnreserveGas(
+		uint32(uintptr(unsafe.Pointer(&id[0]))),
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := binary.LittleEndian.Uint32(result[0:4])
+	if errorCode != 0 {
+		return 0, ErrUnreserveGasFailed
+	}
+
+	gas := binary.LittleEndian.Uint64(result[4:12])
+
+	return gas, nil
+}
+
+func SystemReserveGas(amount uint64) error {
+	var errorCode uint32
+
+	gsys.SystemReserveGas(
+		amount,
+		uint32(uintptr(unsafe.Pointer(&errorCode))),
+	)
+
+	if errorCode != 0 {
+		return ErrSystemReserveGasFailed
+	}
+
+	return nil
 }
