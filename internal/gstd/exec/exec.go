@@ -64,3 +64,7 @@ func SystemReserveGas(amount uint64) error {
 func Exit(inheritorID gcore.ActorID) {
 	gcore.Exit(inheritorID)
 }
+
+func EnvVars() gcore.EnvVarsStruct {
+	return gcore.EnvVars()
+}

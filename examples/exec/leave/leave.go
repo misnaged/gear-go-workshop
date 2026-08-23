@@ -15,7 +15,7 @@ func handle() {
 	if string(payload) == "LEAVE" {
 		exec.Leave()
 
-		// Этого быть не должно.
+		//must not be called in the runtime
 		msg.ReplyBytes([]byte("AFTER_LEAVE"))
 	}
 }

@@ -161,3 +161,31 @@ func Exit(inheritorID ActorID) {
 		uint32(uintptr(unsafe.Pointer(&inheritorID[0]))),
 	)
 }
+
+func EnvVars() EnvVarsStruct {
+	var raw [52]byte
+
+	gsys.EnvVars(
+		1,
+		uint32(uintptr(unsafe.Pointer(&raw[0]))),
+	)
+
+	return EnvVarsStruct{
+		PerformanceMultiplier: binary.LittleEndian.Uint32(raw[0:4]),
+
+		ExistentialDeposit: Uint128{
+			Lo: binary.LittleEndian.Uint64(raw[4:12]),
+			Hi: binary.LittleEndian.Uint64(raw[12:20]),
+		},
+
+		MailboxThreshold: binary.LittleEndian.Uint64(raw[20:28]),
+
+		GasMultiplier: GasMultiplier{
+			GasPerValue: binary.LittleEndian.Uint64(raw[28:36]),
+			ValuePerGas: Uint128{
+				Lo: binary.LittleEndian.Uint64(raw[36:44]),
+				Hi: binary.LittleEndian.Uint64(raw[44:52]),
+			},
+		},
+	}
+}

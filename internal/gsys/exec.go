@@ -44,3 +44,6 @@ func SystemReserveGas(amount uint64, errorPtr uint32)
 
 //go:wasmimport env gr_exit
 func Exit(inheritorIDPtr uint32)
+
+//go:wasmimport env gr_env_vars
+func EnvVars(version uint32, varsPtr uint32)

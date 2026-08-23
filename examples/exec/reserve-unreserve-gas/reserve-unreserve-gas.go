@@ -10,7 +10,11 @@ import (
 
 //go:wasmexport handle
 func handle() {
-	payload, _ := msg.LoadBytes()
+	payload, err := msg.LoadBytes()
+	if err != nil {
+		msg.ReplyBytes([]byte("failed to load payload"))
+		return
+	}
 
 	if string(payload) == "RESERVE" {
 		id, err := exec.ReserveGas(50_000_000, 100)
