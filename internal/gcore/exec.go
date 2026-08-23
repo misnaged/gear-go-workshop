@@ -57,3 +57,47 @@ func WakeDelayed(messageID MessageID, delay uint32) error {
 
 	return nil
 }
+
+func Leave() {
+	gsys.Leave()
+}
+
+func ValueAvailable() Uint128 {
+	var value Uint128
+
+	gsys.ValueAvailable(
+		uint32(uintptr(unsafe.Pointer(&value))),
+	)
+
+	return value
+}
+
+func BlockHeight() uint32 {
+	var height uint32
+
+	gsys.BlockHeight(
+		uint32(uintptr(unsafe.Pointer(&height))),
+	)
+
+	return height
+}
+
+func BlockTimestamp() uint64 {
+	var timestamp uint64
+
+	gsys.BlockTimestamp(
+		uint32(uintptr(unsafe.Pointer(&timestamp))),
+	)
+
+	return timestamp
+}
+func Random(subject [32]byte) ([32]byte, uint32) {
+	var result blockNumberWithHash
+
+	gsys.Random(
+		uint32(uintptr(unsafe.Pointer(&subject[0]))),
+		uint32(uintptr(unsafe.Pointer(&result))),
+	)
+
+	return result.Hash, result.BlockNumber
+}

@@ -17,3 +17,18 @@ func WaitUpTo(duration uint32)
 
 //go:wasmimport env gr_wake
 func Wake(messageIDPtr uint32, delay uint32, errorPtr uint32)
+
+//go:wasmimport env gr_leave
+func Leave()
+
+//go:wasmimport env gr_value_available
+func ValueAvailable(resultPtr uint32)
+
+//go:wasmimport env gr_block_height
+func BlockHeight(resultPtr uint32)
+
+//go:wasmimport env gr_block_timestamp
+func BlockTimestamp(resultPtr uint32)
+
+//go:wasmimport env gr_random
+func Random(subjectPtr uint32, resultPtr uint32)
