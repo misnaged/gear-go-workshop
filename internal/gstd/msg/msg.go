@@ -17,6 +17,11 @@ func LoadBytes() ([]byte, error) {
 func SendBytes(destination gcore.ActorID, payload []byte, value gcore.Uint128) (gcore.MessageID, error) {
 	return gcore.Send(destination, payload, value)
 }
+
+func Size() int {
+	return gcore.Size()
+}
+
 func ReplyTo() (gcore.MessageID, error) {
 	return gcore.ReplyTo()
 }
@@ -29,4 +34,20 @@ func Source() gcore.ActorID {
 }
 func Value() gcore.Uint128 {
 	return gcore.Value()
+}
+
+func ReplyCode() (gcore.ReplyCodeBytes, error) {
+	return gcore.ReplyCode()
+}
+
+func SignalCode() (gcore.SignalCodeValue, error) {
+	return gcore.SignalCode()
+}
+
+func ReplyBytesFromReservation(reservationID gcore.ReservationID, payload []byte, value gcore.Uint128) (gcore.MessageID, error) {
+	return gcore.ReplyFromReservation(
+		reservationID,
+		payload,
+		value,
+	)
 }
