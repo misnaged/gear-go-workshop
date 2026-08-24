@@ -46,3 +46,17 @@ func Value(resultPtr uint32)
 
 //go:wasmimport env gr_reply_to
 func ReplyTo(resultPtr uint32)
+
+//go:wasmimport env gr_reply_code
+func ReplyCode(resultPtr uint32)
+
+//go:wasmimport env gr_signal_code
+func SignalCode(resultPtr uint32)
+
+//go:wasmimport env gr_reservation_reply
+func ReservationReply(
+	reservationValuePtr uint32,
+	payloadPtr uint32,
+	payloadLen uint32,
+	resultPtr uint32,
+)

@@ -102,7 +102,32 @@ func Read(buffer []byte) error {
 
 	return nil
 }
+func ReadAt(offset int, buffer []byte) error {
+	if len(buffer) == 0 {
+		return nil
+	}
 
+	size := Size()
+
+	if size > len(buffer)+offset {
+		return ErrBufferTooSmall
+	}
+
+	var errorCode uint32
+
+	gsys.Read(
+		uint32(offset),
+		uint32(len(buffer)),
+		uint32(uintptr(unsafe.Pointer(&buffer[0]))),
+		uint32(uintptr(unsafe.Pointer(&errorCode))),
+	)
+
+	if errorCode != 0 {
+		return ErrReadFailed
+	}
+
+	return nil
+}
 func Size() int {
 	var size uint32
 
@@ -158,4 +183,86 @@ func ReplyDeposit(messageID MessageID, gas uint64) error {
 	}
 
 	return nil
+}
+
+func ReplyCode() (ReplyCodeBytes, error) {
+	var result [8]byte
+
+	gsys.ReplyCode(
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return ReplyCodeBytes{}, ErrReplyCodeFailed
+	}
+
+	var code ReplyCodeBytes
+	copy(code[:], result[4:8])
+
+	return code, nil
+}
+
+func SignalCode() (SignalCodeValue, error) {
+	var result [8]byte
+
+	gsys.SignalCode(
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return 0, ErrSignalCodeFailed
+	}
+
+	code := SignalCodeValue(
+		*(*uint32)(unsafe.Pointer(&result[4])),
+	)
+
+	switch code {
+	case SignalUserspacePanic,
+		SignalRanOutOfGas,
+		SignalBackendError,
+		SignalMemoryOverflow,
+		SignalUnreachableInstruction,
+		SignalStackLimitExceeded,
+		SignalRemovedFromWaitlist,
+		SignalUnsupported:
+		return code, nil
+	default:
+		return 0, ErrUnsupportedSignalCode
+	}
+}
+
+func ReplyFromReservation(reservationID ReservationID, payload []byte, value Uint128) (MessageID, error) {
+	ridValue := hashWithValue{
+		Hash:  ActorID(reservationID),
+		Value: value,
+	}
+
+	var result [36]byte
+
+	var payloadPtr uint32
+	if len(payload) > 0 {
+		payloadPtr = uint32(
+			uintptr(unsafe.Pointer(&payload[0])),
+		)
+	}
+
+	gsys.ReservationReply(
+		uint32(uintptr(unsafe.Pointer(&ridValue))),
+		payloadPtr,
+		uint32(len(payload)),
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyFromReservationFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
 }
