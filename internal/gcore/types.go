@@ -20,6 +20,8 @@ type ActorID [32]byte
 
 type MessageID [32]byte
 
+type MessageHandle uint32
+
 type ReservationID [32]byte
 
 type ReplyCodeBytes [4]byte
@@ -51,6 +53,11 @@ type EnvVarsStruct struct {
 }
 type hashWithValue struct {
 	Hash  ActorID
+	Value Uint128
+}
+type twoHashesWithValue struct {
+	Hash1 ActorID
+	Hash2 ActorID
 	Value Uint128
 }
 type blockNumberWithHash struct {

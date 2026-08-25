@@ -50,6 +50,18 @@ func ReplyTo(resultPtr uint32)
 //go:wasmimport env gr_reply_code
 func ReplyCode(resultPtr uint32)
 
+//go:wasmimport env gr_reply_wgas
+func ReplyWithGas(
+	payloadPtr uint32,
+	payloadLen uint32,
+	gasLimit uint64,
+	valuePtr uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_reply_commit
+func ReplyCommit(valuePtr uint32, resultPtr uint32)
+
 //go:wasmimport env gr_signal_code
 func SignalCode(resultPtr uint32)
 
@@ -58,5 +70,104 @@ func ReservationReply(
 	reservationValuePtr uint32,
 	payloadPtr uint32,
 	payloadLen uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_reply_input
+func ReplyInput(
+	offset uint32,
+	length uint32,
+	valuePtr uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_reply_push_input
+func ReplyPushInput(
+	offset uint32,
+	length uint32,
+	errorPtr uint32,
+)
+
+//go:wasmimport env gr_reservation_reply_commit
+func ReservationReplyCommit(
+	reservationValuePtr uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_reservation_send_commit
+func ReservationSendCommit(
+	handle uint32,
+	reservationDestinationValuePtr uint32,
+	delay uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_reply_commit_wgas
+func ReplyCommitWithGas(
+	gasLimit uint64,
+	valuePtr uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_reply_push
+func ReplyPush(
+	payloadPtr uint32,
+	payloadLen uint32,
+	errorPtr uint32,
+)
+
+//go:wasmimport env gr_reply_input_wgas
+func ReplyInputWithGas(
+	offset uint32,
+	length uint32,
+	gasLimit uint64,
+	valuePtr uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_send_input
+func SendInput(
+	destinationValuePtr uint32,
+	offset uint32,
+	length uint32,
+	delay uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_reservation_send
+func ReservationSend(
+	reservationDestinationValuePtr uint32,
+	payloadPtr uint32,
+	payloadLen uint32,
+	delay uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_send_init
+func SendInit(resultPtr uint32)
+
+//go:wasmimport env gr_send_push_input
+func SendPushInput(
+	handle uint32,
+	offset uint32,
+	length uint32,
+	errorPtr uint32,
+)
+
+//go:wasmimport env gr_send_commit
+func SendCommit(
+	handle uint32,
+	destinationValuePtr uint32,
+	delay uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_send_input_wgas
+func SendInputWithGas(
+	destinationValuePtr uint32,
+	offset uint32,
+	length uint32,
+	gasLimit uint64,
+	delay uint32,
 	resultPtr uint32,
 )

@@ -266,3 +266,459 @@ func ReplyFromReservation(reservationID ReservationID, payload []byte, value Uin
 
 	return id, nil
 }
+
+func ReplyWithGas(payload []byte, gasLimit uint64, value Uint128) (MessageID, error) {
+	var result [36]byte
+
+	var payloadPtr uint32
+	if len(payload) > 0 {
+		payloadPtr = uint32(
+			uintptr(unsafe.Pointer(&payload[0])),
+		)
+	}
+
+	valuePtr := zeroValuePtr
+
+	if value.Lo != 0 || value.Hi != 0 {
+		valuePtr = uint32(
+			uintptr(unsafe.Pointer(&value)),
+		)
+	}
+
+	gsys.ReplyWithGas(
+		payloadPtr,
+		uint32(len(payload)),
+		gasLimit,
+		valuePtr,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyWithGasFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func ReplyCommit(value Uint128) (MessageID, error) {
+	var result [36]byte
+
+	valuePtr := zeroValuePtr
+
+	if value.Lo != 0 || value.Hi != 0 {
+		valuePtr = uint32(
+			uintptr(unsafe.Pointer(&value)),
+		)
+	}
+
+	gsys.ReplyCommit(
+		valuePtr,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyCommitFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func ReplyPush(payload []byte) error {
+	var errorCode uint32
+
+	var payloadPtr uint32
+	if len(payload) > 0 {
+		payloadPtr = uint32(
+			uintptr(unsafe.Pointer(&payload[0])),
+		)
+	}
+
+	gsys.ReplyPush(
+		payloadPtr,
+		uint32(len(payload)),
+		uint32(uintptr(unsafe.Pointer(&errorCode))),
+	)
+
+	if errorCode != 0 {
+		return ErrReplyPushFailed
+	}
+
+	return nil
+}
+
+func ReplyCommitWithGas(gasLimit uint64, value Uint128) (MessageID, error) {
+	var result [36]byte
+
+	valuePtr := zeroValuePtr
+
+	if value.Lo != 0 || value.Hi != 0 {
+		valuePtr = uint32(
+			uintptr(unsafe.Pointer(&value)),
+		)
+	}
+
+	gsys.ReplyCommitWithGas(
+		gasLimit,
+		valuePtr,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyCommitWithGasFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func ReplyCommitFromReservation(reservationID ReservationID, value Uint128) (MessageID, error) {
+	ridValue := hashWithValue{
+		Hash:  ActorID(reservationID),
+		Value: value,
+	}
+
+	var result [36]byte
+
+	gsys.ReservationReplyCommit(
+		uint32(uintptr(unsafe.Pointer(&ridValue))),
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyCommitFromReservationFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func ReplyInput(value Uint128, offset uint32, length uint32) (MessageID, error) {
+	var result [36]byte
+
+	valuePtr := zeroValuePtr
+
+	if value.Lo != 0 || value.Hi != 0 {
+		valuePtr = uint32(
+			uintptr(unsafe.Pointer(&value)),
+		)
+	}
+
+	gsys.ReplyInput(
+		offset,
+		length,
+		valuePtr,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyInputFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func ReplyPushInput(offset uint32, length uint32) error {
+	var errorCode uint32
+
+	gsys.ReplyPushInput(
+		offset,
+		length,
+		uint32(uintptr(unsafe.Pointer(&errorCode))),
+	)
+
+	if errorCode != 0 {
+		return ErrReplyPushInputFailed
+	}
+
+	return nil
+}
+
+func ReplyInputWithGas(gasLimit uint64, value Uint128, offset uint32, length uint32) (MessageID, error) {
+	var result [36]byte
+
+	valuePtr := zeroValuePtr
+
+	if value.Lo != 0 || value.Hi != 0 {
+		valuePtr = uint32(
+			uintptr(unsafe.Pointer(&value)),
+		)
+	}
+
+	gsys.ReplyInputWithGas(
+		offset,
+		length,
+		gasLimit,
+		valuePtr,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrReplyInputWithGasFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func SendInput(destination ActorID, value Uint128, offset uint32, length uint32) (MessageID, error) {
+	pidValue := hashWithValue{
+		Hash:  destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	gsys.SendInput(
+		uint32(uintptr(unsafe.Pointer(&pidValue))),
+		offset,
+		length,
+		0,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendInputFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func SendInputDelayed(destination ActorID, value Uint128, offset uint32, length uint32, delay uint32) (MessageID, error) {
+	pidValue := hashWithValue{
+		Hash:  destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	gsys.SendInput(
+		uint32(uintptr(unsafe.Pointer(&pidValue))),
+		offset,
+		length,
+		delay,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendInputFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func SendFromReservation(reservationID ReservationID, destination ActorID, payload []byte, value Uint128) (MessageID, error) {
+	return SendDelayedFromReservation(
+		reservationID,
+		destination,
+		payload,
+		value,
+		0,
+	)
+}
+
+func SendDelayedFromReservation(reservationID ReservationID, destination ActorID, payload []byte, value Uint128, delay uint32) (MessageID, error) {
+	ridPidValue := twoHashesWithValue{
+		Hash1: ActorID(reservationID),
+		Hash2: destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	var payloadPtr uint32
+	if len(payload) > 0 {
+		payloadPtr = uint32(
+			uintptr(unsafe.Pointer(&payload[0])),
+		)
+	}
+
+	gsys.ReservationSend(
+		uint32(uintptr(unsafe.Pointer(&ridPidValue))),
+		payloadPtr,
+		uint32(len(payload)),
+		delay,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendFromReservationFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func SendInit() (MessageHandle, error) {
+	var result [8]byte
+
+	gsys.SendInit(
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return 0, ErrSendInitFailed
+	}
+
+	handle := *(*uint32)(unsafe.Pointer(&result[4]))
+
+	return MessageHandle(handle), nil
+}
+func SendPushInput(handle MessageHandle, offset uint32, length uint32) error {
+	var errorCode uint32
+
+	gsys.SendPushInput(
+		uint32(handle),
+		offset,
+		length,
+		uint32(uintptr(unsafe.Pointer(&errorCode))),
+	)
+
+	if errorCode != 0 {
+		return ErrSendPushInputFailed
+	}
+
+	return nil
+}
+func SendCommit(handle MessageHandle, destination ActorID, value Uint128) (MessageID, error) {
+	pidValue := hashWithValue{
+		Hash:  destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	gsys.SendCommit(
+		uint32(handle),
+		uint32(uintptr(unsafe.Pointer(&pidValue))),
+		0,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendCommitFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+func SendInputWithGas(destination ActorID, gasLimit uint64, value Uint128, offset, length uint32) (MessageID, error) {
+	return SendInputWithGasDelayed(
+		destination,
+		gasLimit,
+		value,
+		offset,
+		length,
+		0,
+	)
+}
+func SendInputWithGasDelayed(destination ActorID, gasLimit uint64, value Uint128, offset, length, delay uint32) (MessageID, error) {
+	pidValue := hashWithValue{
+		Hash:  destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	gsys.SendInputWithGas(
+		uint32(uintptr(unsafe.Pointer(&pidValue))),
+		offset,
+		length,
+		gasLimit,
+		delay,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendInputWithGasFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func SendCommitFromReservation(
+	reservationID ReservationID,
+	handle MessageHandle,
+	destination ActorID,
+	value Uint128,
+) (MessageID, error) {
+	return SendCommitDelayedFromReservation(
+		reservationID,
+		handle,
+		destination,
+		value,
+		0,
+	)
+}
+
+func SendCommitDelayedFromReservation(
+	reservationID ReservationID,
+	handle MessageHandle,
+	destination ActorID,
+	value Uint128,
+	delay uint32,
+) (MessageID, error) {
+	ridPidValue := twoHashesWithValue{
+		Hash1: ActorID(reservationID),
+		Hash2: destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	gsys.ReservationSendCommit(
+		uint32(handle),
+		uint32(uintptr(unsafe.Pointer(&ridPidValue))),
+		delay,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendCommitFromReservationFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
