@@ -138,6 +138,15 @@ func Size() int {
 	return int(size)
 }
 func Send(destination ActorID, payload []byte, value Uint128) (MessageID, error) {
+	return SendDelayed(
+		destination,
+		payload,
+		value,
+		0,
+	)
+}
+
+func SendDelayed(destination ActorID, payload []byte, value Uint128, delay uint32) (MessageID, error) {
 	pidValue := hashWithValue{
 		Hash:  destination,
 		Value: value,
@@ -154,7 +163,7 @@ func Send(destination ActorID, payload []byte, value Uint128) (MessageID, error)
 		uint32(uintptr(unsafe.Pointer(&pidValue))),
 		payloadPtr,
 		uint32(len(payload)),
-		0,
+		delay,
 		uint32(uintptr(unsafe.Pointer(&result[0]))),
 	)
 
@@ -164,7 +173,7 @@ func Send(destination ActorID, payload []byte, value Uint128) (MessageID, error)
 	}
 
 	var id MessageID
-	copy(id[:], result[4:])
+	copy(id[:], result[4:36])
 
 	return id, nil
 }

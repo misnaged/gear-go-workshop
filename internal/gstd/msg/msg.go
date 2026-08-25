@@ -18,6 +18,15 @@ func SendBytes(destination gcore.ActorID, payload []byte, value gcore.Uint128) (
 	return gcore.Send(destination, payload, value)
 }
 
+func SendBytesDelayed(destination gcore.ActorID, payload []byte, value gcore.Uint128, delay uint32) (gcore.MessageID, error) {
+	return gcore.SendDelayed(
+		destination,
+		payload,
+		value,
+		delay,
+	)
+}
+
 func Size() int {
 	return gcore.Size()
 }
