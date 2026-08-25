@@ -5,6 +5,8 @@ vars:
   TINYGO_CFG: ./config/tinygo/gear.json
 
 tasks:
+  build:
+    cmd: '{{.BIN}} build -target {{.TINYGO_CFG}} -o ../gear-go/assets/wasm/test/program.wasm .'
   wasm-build:
     cmds:
       - cmd: echo 'make sure you have up-to-date CUSTOM tinygo binary either built from the source (https://github.com/misnaged/tinygo) or downloaded from release (https://github.com/misnaged/tinygo/releases)'

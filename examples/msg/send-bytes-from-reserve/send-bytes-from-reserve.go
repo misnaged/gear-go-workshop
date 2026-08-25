@@ -1,14 +1,3 @@
-/*
-package main
-
-//go:wasmexport handle
-func handle() {
-	//default entrypoint. for examples see ./examples
-}
-
-func main() {}
-*/
-
 package main
 
 import (
@@ -28,29 +17,15 @@ func handle() {
 		ext.Panic("reserve gas failed")
 	}
 
-	handle, err := msg.SendInit()
-	if err != nil {
-		ext.Panic("send init failed")
-	}
-
-	err = msg.SendPushInput(
-		handle,
-		8,
-		11,
-	)
-	if err != nil {
-		ext.Panic("send push input failed")
-	}
-
-	_, err = msg.SendCommitDelayedFromReservation(
+	_, err = msg.SendBytesFromReservation(
 		reservationID,
-		handle,
 		msg.Source(),
+		[]byte("SEND_FROM_RESERVATION"),
 		gcore.Uint128{},
-		5,
 	)
 	if err != nil {
-		ext.Panic("send commit delayed from reservation failed")
+		ext.Panic("send from reservation failed")
 	}
 }
+
 func main() {}
