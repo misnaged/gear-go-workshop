@@ -1,10 +1,24 @@
 package main
 
 import (
+	"github.com/misnaged/gear-go-workshop/internal/gcore"
 	"github.com/misnaged/gear-go-workshop/internal/gstd/exec"
 	"github.com/misnaged/gear-go-workshop/internal/gstd/ext"
 	"github.com/misnaged/gear-go-workshop/internal/gstd/msg"
 )
+
+func messageIDHex(id gcore.MessageID) string {
+	const hex = "0123456789abcdef"
+
+	var out [64]byte
+
+	for i, b := range id {
+		out[i*2] = hex[b>>4]
+		out[i*2+1] = hex[b&0x0f]
+	}
+
+	return string(out[:])
+}
 
 //go:wasmexport handle
 func handle() {
@@ -17,9 +31,10 @@ func handle() {
 
 //go:wasmexport handle_signal
 func handleSignal() {
-	if _, err := msg.SignalFrom(); err != nil {
+	id, err := msg.SignalFrom()
+	if err != nil {
 		ext.Panic("failed to get signal source")
 	}
-}
 
-func main() {}
+	ext.Panic("signal_from=0x" + messageIDHex(id))
+}
