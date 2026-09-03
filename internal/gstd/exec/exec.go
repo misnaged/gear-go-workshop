@@ -68,3 +68,7 @@ func Exit(inheritorID gcore.ActorID) {
 func EnvVars() gcore.EnvVarsStruct {
 	return gcore.EnvVars()
 }
+
+func ReplyDeposit(messageID gcore.MessageID, gas uint64) error {
+	return gcore.ReplyDeposit(messageID, gas)
+}
