@@ -243,6 +243,24 @@ func SignalCode() (SignalCodeValue, error) {
 	}
 }
 
+func SignalFrom() (MessageID, error) {
+	var result [36]byte
+
+	gsys.SignalFrom(
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSignalFromFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
 func ReplyFromReservation(reservationID ReservationID, payload []byte, value Uint128) (MessageID, error) {
 	ridValue := hashWithValue{
 		Hash:  ActorID(reservationID),
@@ -621,7 +639,36 @@ func SendPushInput(handle MessageHandle, offset uint32, length uint32) error {
 
 	return nil
 }
+
+func SendPush(handle MessageHandle, payload []byte) error {
+	var errorCode uint32
+
+	var payloadPtr uint32
+	if len(payload) > 0 {
+		payloadPtr = uint32(
+			uintptr(unsafe.Pointer(&payload[0])),
+		)
+	}
+
+	gsys.SendPush(
+		uint32(handle),
+		payloadPtr,
+		uint32(len(payload)),
+		uint32(uintptr(unsafe.Pointer(&errorCode))),
+	)
+
+	if errorCode != 0 {
+		return ErrSendPushFailed
+	}
+
+	return nil
+}
+
 func SendCommit(handle MessageHandle, destination ActorID, value Uint128) (MessageID, error) {
+	return SendCommitDelayed(handle, destination, value, 0)
+}
+
+func SendCommitDelayed(handle MessageHandle, destination ActorID, value Uint128, delay uint32) (MessageID, error) {
 	pidValue := hashWithValue{
 		Hash:  destination,
 		Value: value,
@@ -632,7 +679,7 @@ func SendCommit(handle MessageHandle, destination ActorID, value Uint128) (Messa
 	gsys.SendCommit(
 		uint32(handle),
 		uint32(uintptr(unsafe.Pointer(&pidValue))),
-		0,
+		delay,
 		uint32(uintptr(unsafe.Pointer(&result[0]))),
 	)
 
@@ -646,6 +693,50 @@ func SendCommit(handle MessageHandle, destination ActorID, value Uint128) (Messa
 
 	return id, nil
 }
+
+func SendCommitWithGas(handle MessageHandle, destination ActorID, gasLimit uint64, value Uint128) (MessageID, error) {
+	return SendCommitWithGasDelayed(
+		handle,
+		destination,
+		gasLimit,
+		value,
+		0,
+	)
+}
+
+func SendCommitWithGasDelayed(
+	handle MessageHandle,
+	destination ActorID,
+	gasLimit uint64,
+	value Uint128,
+	delay uint32,
+) (MessageID, error) {
+	pidValue := hashWithValue{
+		Hash:  destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	gsys.SendCommitWithGas(
+		uint32(handle),
+		uint32(uintptr(unsafe.Pointer(&pidValue))),
+		gasLimit,
+		delay,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendCommitWithGasFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
 func SendInputWithGas(destination ActorID, gasLimit uint64, value Uint128, offset, length uint32) (MessageID, error) {
 	return SendInputWithGasDelayed(
 		destination,
@@ -724,6 +815,49 @@ func SendCommitDelayedFromReservation(
 	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
 	if errorCode != 0 {
 		return MessageID{}, ErrSendCommitFromReservationFailed
+	}
+
+	var id MessageID
+	copy(id[:], result[4:36])
+
+	return id, nil
+}
+
+func SendWithGas(destination ActorID, payload []byte, gasLimit uint64, value Uint128) (MessageID, error) {
+	return SendWithGasDelayed(
+		destination,
+		payload,
+		gasLimit,
+		value,
+		0,
+	)
+}
+
+func SendWithGasDelayed(destination ActorID, payload []byte, gasLimit uint64, value Uint128, delay uint32) (MessageID, error) {
+	pidValue := hashWithValue{
+		Hash:  destination,
+		Value: value,
+	}
+
+	var result [36]byte
+
+	var payloadPtr uint32
+	if len(payload) > 0 {
+		payloadPtr = uint32(uintptr(unsafe.Pointer(&payload[0])))
+	}
+
+	gsys.SendWithGas(
+		uint32(uintptr(unsafe.Pointer(&pidValue))),
+		payloadPtr,
+		uint32(len(payload)),
+		gasLimit,
+		delay,
+		uint32(uintptr(unsafe.Pointer(&result[0]))),
+	)
+
+	errorCode := *(*uint32)(unsafe.Pointer(&result[0]))
+	if errorCode != 0 {
+		return MessageID{}, ErrSendWithGasFailed
 	}
 
 	var id MessageID

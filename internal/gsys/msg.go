@@ -65,6 +65,9 @@ func ReplyCommit(valuePtr uint32, resultPtr uint32)
 //go:wasmimport env gr_signal_code
 func SignalCode(resultPtr uint32)
 
+//go:wasmimport env gr_signal_from
+func SignalFrom(resultPtr uint32)
+
 //go:wasmimport env gr_reservation_reply
 func ReservationReply(
 	reservationValuePtr uint32,
@@ -154,6 +157,14 @@ func SendPushInput(
 	errorPtr uint32,
 )
 
+//go:wasmimport env gr_send_push
+func SendPush(
+	handle uint32,
+	payloadPtr uint32,
+	payloadLen uint32,
+	errorPtr uint32,
+)
+
 //go:wasmimport env gr_send_commit
 func SendCommit(
 	handle uint32,
@@ -167,6 +178,25 @@ func SendInputWithGas(
 	destinationValuePtr uint32,
 	offset uint32,
 	length uint32,
+	gasLimit uint64,
+	delay uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_send_wgas
+func SendWithGas(
+	destinationValuePtr uint32,
+	payloadPtr uint32,
+	payloadLen uint32,
+	gasLimit uint64,
+	delay uint32,
+	resultPtr uint32,
+)
+
+//go:wasmimport env gr_send_commit_wgas
+func SendCommitWithGas(
+	handle uint32,
+	destinationValuePtr uint32,
 	gasLimit uint64,
 	delay uint32,
 	resultPtr uint32,
