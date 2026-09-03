@@ -53,6 +53,10 @@ func SignalCode() (gcore.SignalCodeValue, error) {
 	return gcore.SignalCode()
 }
 
+func SignalFrom() (gcore.MessageID, error) {
+	return gcore.SignalFrom()
+}
+
 func ReplyBytesFromReservation(reservationID gcore.ReservationID, payload []byte, value gcore.Uint128) (gcore.MessageID, error) {
 	return gcore.ReplyFromReservation(
 		reservationID,
@@ -161,6 +165,34 @@ func SendPushInput(handle gcore.MessageHandle, offset, length uint32) error {
 func SendCommit(handle gcore.MessageHandle, destination gcore.ActorID, value gcore.Uint128) (gcore.MessageID, error) {
 	return gcore.SendCommit(handle, destination, value)
 }
+
+func SendCommitDelayed(handle gcore.MessageHandle, destination gcore.ActorID, value gcore.Uint128, delay uint32) (gcore.MessageID, error) {
+	return gcore.SendCommitDelayed(handle, destination, value, delay)
+}
+
+func SendCommitWithGas(handle gcore.MessageHandle, destination gcore.ActorID, gasLimit uint64, value gcore.Uint128) (gcore.MessageID, error) {
+	return gcore.SendCommitWithGas(
+		handle,
+		destination,
+		gasLimit,
+		value,
+	)
+}
+func SendCommitWithGasDelayed(
+	handle gcore.MessageHandle,
+	destination gcore.ActorID,
+	gasLimit uint64,
+	value gcore.Uint128,
+	delay uint32,
+) (gcore.MessageID, error) {
+	return gcore.SendCommitWithGasDelayed(
+		handle,
+		destination,
+		gasLimit,
+		value,
+		delay,
+	)
+}
 func SendInputWithGas(destination gcore.ActorID, gasLimit uint64, value gcore.Uint128, offset, length uint32) (gcore.MessageID, error) {
 	return gcore.SendInputWithGas(
 		destination,
@@ -195,6 +227,24 @@ func SendCommitDelayedFromReservation(reservationID gcore.ReservationID, handle 
 		reservationID,
 		handle,
 		destination,
+		value,
+		delay,
+	)
+}
+
+func SendBytesWithGas(destination gcore.ActorID, payload []byte, gasLimit uint64, value gcore.Uint128) (gcore.MessageID, error) {
+	return gcore.SendWithGas(
+		destination,
+		payload,
+		gasLimit,
+		value,
+	)
+}
+func SendBytesWithGasDelayed(destination gcore.ActorID, payload []byte, gasLimit uint64, value gcore.Uint128, delay uint32) (gcore.MessageID, error) {
+	return gcore.SendWithGasDelayed(
+		destination,
+		payload,
+		gasLimit,
 		value,
 		delay,
 	)
