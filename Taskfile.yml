@@ -5,8 +5,11 @@ vars:
   TINYGO_CFG: ./config/tinygo/gear.json
 
 tasks:
-  build:
-    cmd: '{{.BIN}} build -target {{.TINYGO_CFG}} -o ../gear-go/assets/wasm/test/program.wasm .'
+  js-example-run:
+    cmds:
+      - cmd: '{{.BIN}} build -target {{.TINYGO_CFG}} -o ./examples/js/async/echo.wasm ./examples/async/echo/'
+      - cmd: '{{.BIN}} build -target {{.TINYGO_CFG}} -o ./examples/js/async/program.wasm ./examples/async/ping-pong-async/'
+      - cmd: 'node ./examples/js/async/test.mjs     ./examples/js/async/echo.wasm    ./examples/js/async/program.wasm'
   wasm-build:
     cmds:
       - cmd: echo 'make sure you have up-to-date CUSTOM tinygo binary either built from the source (https://github.com/misnaged/tinygo) or downloaded from release (https://github.com/misnaged/tinygo/releases)'
