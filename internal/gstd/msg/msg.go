@@ -161,6 +161,9 @@ func SendInit() (gcore.MessageHandle, error) {
 func SendPushInput(handle gcore.MessageHandle, offset, length uint32) error {
 	return gcore.SendPushInput(handle, offset, length)
 }
+func SendPush(handle gcore.MessageHandle, payload []byte) error {
+	return gcore.SendPush(handle, payload)
+}
 
 func SendCommit(handle gcore.MessageHandle, destination gcore.ActorID, value gcore.Uint128) (gcore.MessageID, error) {
 	return gcore.SendCommit(handle, destination, value)
